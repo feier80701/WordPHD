@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>研究生英语单词</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; background:#F5F7FA; color:#2D3436; min-height:100vh; padding-bottom:80px; }
+.header { background:linear-gradient(135deg,#4A90D9,#6BA8E2); color:white; padding:20px 90px 20px 20px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(74,144,217,0.3); }
+.header h1 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.header .subtitle { font-size:13px; opacity:0.85; }
+.header-right { position:absolute; right:16px; top:50%; transform:translateY(-50%); display:flex; gap:8px; }
+.header-right button { padding:7px 14px; border:1.5px solid rgba(255,255,255,0.7); background:rgba(255,255,255,0.15); color:white; border-radius:12px; font-size:12px; cursor:pointer; white-space:nowrap; }
+.stats-bar { display:flex; gap:10px; padding:14px 20px; background:#FFF; margin:12px 16px 0; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.stat-item { flex:1; text-align:center; }
+.stat-num { font-size:22px; font-weight:800; color:#4A90D9; }
+.stat-label { font-size:11px; color:#636E72; margin-top:2px; }
+.tab-btns { display:flex; gap:0; margin:12px 16px; background:#FFF; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden; }
+.tab-btn { flex:1; padding:12px 8px; border:none; background:transparent; font-size:15px; font-weight:600; color:#636E72; cursor:pointer; }
+.tab-btn.active { background:#4A90D9; color:white; }
+.mode-switcher { display:flex; justify-content:center; gap:12px; margin:14px 16px; }
+.mode-btn { padding:10px 20px; border:2px solid #4A90D9; background:white; border-radius:30px; font-size:14px; font-weight:600; cursor:pointer; }
+.mode-btn.active-mode { background:#4A90D9; color:white; }
+.card-container { display:flex; flex-direction:column; align-items:center; padding:20px 16px; }
+.word-card { width:100%; max-width:380px; min-height:260px; background:#FFF; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer; }
+.card-front, .card-back { width:100%; min-height:260px; padding:32px 24px; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.card-front { background:linear-gradient(145deg,#667eea,#764ba2); color:white; }
+.card-back { background:linear-gradient(145deg,#11998e,#38ef7d); color:white; display:none; }
+.card-word { font-size:36px; font-weight:800; text-align:center; line-height:1.3; margin-bottom:12px; }
+.card-meaning { font-size:22px; font-weight:600; text-align:center; line-height:1.5; margin-bottom:12px; }
+.card-group-info { font-size:13px; opacity:0.85; background:rgba(255,255,255,0.2); padding:6px 14px; border-radius:20px; margin-top:8px; }
+.card-actions { display:flex; gap:12px; margin-top:20px; width:100%; max-width:380px; }
+.action-btn { flex:1; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; color:white; }
+.btn-know { background:#51CF66; }
+.btn-forget { background:#FF6B6B; }
+.btn-next { background:#4A90D9; color:white; width:100%; margin-top:10px; border:none; border-radius:12px; padding:16px; font-size:17px; font-weight:700; cursor:pointer; }
+.progress-wrap { padding:0 16px; margin-top:12px; }
+.progress-track { height:6px; background:#E0E0E0; border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#51CF66,#38ef7d); border-radius:3px; transition:width 0.3s; width:0%; }
+.progress-text { font-size:12px; color:#636E72; margin-top:6px; text-align:center; }
+.group-list { padding:8px 16px; }
+.group-item { background:#FFF; border-radius:16px; padding:16px 18px; margin-bottom:10px; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer; }
+.group-page { font-size:11px; color:#636E72; background:#E8F0FE; padding:3px 10px; border-radius:10px; display:inline-block; margin-bottom:8px; }
+.group-words { font-size:16px; font-weight:600; color:#2D3436; line-height:1.6; }
+.group-meaning { font-size:13px; color:#636E72; margin-top:8px; display:none; padding-top:8px; border-top:1px dashed #eee; }
+.group-meaning.show { display:block; }
+.search-box { margin:12px 16px; }
+.search-input { width:100%; padding:14px 18px; border:2px solid #E0E0E0; border-radius:16px; font-size:16px; outline:none; }
+.search-input:focus { border-color:#4A90D9; }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; display:flex; box-shadow:0 -2px 10px rgba(0,0,0,0.06); z-index:100; }
+.nav-item { flex:1; padding:12px 0; text-align:center; font-size:12px; color:#636E72; cursor:pointer; border:none; background:none; }
+.nav-item.active-nav { color:#4A90D9; }
+.nav-icon { font-size:22px; margin-bottom:2px; }
+.page-section { display:none; }
+.page-section.active-page { display:block; }
+.mastered-badge { display:inline-block; background:#D4EDDA; color:#155724; font-size:11px; padding:2px 8px; border-radius:8px; margin-left:8px; }
+.empty-state { text-align:center; padding:60px 20px; color:#636E72; }
+
+/* 更新弹窗 */
+#updateModal { display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.5); z-index:1000; justify-content:center; align-items:center; }
+#updateModal.show { display:flex; }
+.update-modal-box { background:white; border-radius:20px; padding:28px 24px; width:92%; max-width:420px; box-shadow:0 20px 60px rgba(0,0,0,0.3); max-height:80vh; overflow-y:auto; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📚 研究生英语单词</h1>
+  <div class="subtitle">按同义词组记忆 · 高效备考</div>
+  <div class="header-right">
+    <button onclick="document.getElementById('excelInput').click()">📥 更新单词库</button>
+  </div>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="tab-btns">
+  <button class="tab-btn active" onclick="switchTab('flashcard',this)">🃏 闪卡</button>
+  <button class="tab-btn" onclick="switchTab('group',this)">📋 词组</button>
+  <button class="tab-btn" onclick="switchTab('search',this)">🔍 查词</button>
+</div>
+
+<div id="page-flashcard" class="page-section active-page">
+  <div class="mode-switcher">
+    <button class="mode-btn active-mode" onclick="switchMode('all',this)">全部</button>
+    <button class="mode-btn" onclick="switchMode('bi',this)">双向</button>
+    <button class="mode-btn" onclick="switchMode('uni',this)">单向</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0 / 0</div>
+  </div>
+  <div class="card-container" id="cardArea"></div>
+</div>
+
+<div id="page-group" class="page-section">
+  <div style="padding:8px 16px;">
+    <button onclick="filterGroup('all',this)" style="padding:8px 12px;border:none;background:#4A90D9;color:white;border-radius:8px;cursor:pointer;margin-right:4px;">全部</button>
+    <button onclick="filterGroup('mastered',this)" style="padding:8px 12px;border:1px solid #4A90D9;background:transparent;color:#4A90D9;border-radius:8px;cursor:pointer;margin-right:4px;">已掌握</button>
+    <button onclick="filterGroup('unmastered',this)" style="padding:8px 12px;border:1px solid #4A90D9;background:transparent;color:#4A90D9;border-radius:8px;cursor:pointer;">未掌握</button>
+  </div>
+  <div class="search-box"><input type="text" class="search-input" id="filterInput" placeholder="筛选词组..." oninput="doFilter()"></div>
+  <div class="group-list" id="groupList"></div>
+</div>
+
+<div id="page-search" class="page-section">
+  <div class="search-box"><input type="text" class="search-input" id="wordSearchInput" placeholder="输入英文单词..." oninput="doSearch()"></div>
+  <div id="searchResult" style="padding:16px;"></div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-item active-nav" onclick="goPage('flashcard',this)"><div class="nav-icon">🃏</div>闪卡</button>
+  <button class="nav-item" onclick="goPage('group',this)"><div class="nav-icon">📋</div>词组</button>
+  <button class="nav-item" onclick="goPage('search',this)"><div class="nav-icon">🔍</div>查词</button>
+</div>
+
+<!-- 隐藏的文件输入 -->
+<input type="file" id="excelInput" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleExcelUpload(event)">
+
+<!-- 更新结果弹窗 -->
+<div id="updateModal">
+  <div class="update-modal-box">
+    <div style="font-size:18px;font-weight:700;text-align:center;margin-bottom:16px;">📥 单词库更新结果</div>
+    <div id="updateMsg" style="font-size:14px;color:#333;line-height:1.8;"></div>
+    <button onclick="closeUpdateModal()" style="width:100%;padding:12px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;background:#4A90D9;color:white;margin-top:16px;">确定</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script>
+// ===== 默认数据（第一次使用时）=====
+// 默认只有示例数据，实际词库从 word_data.js 加载
+var DEFAULT_DATA = {"bi":[{"words":["illness","sickness","disease"],"meaning":"n. 疾病","page":7},{"words":["happy","glad","joyful"],"meaning":"adj. 高兴","page":7}],"uni":[]};
+
+// ===== 状态 =====
+// 词库从外部文件加载，先定义为空，由 word_data.js 或 loadExternalVocab 来填充
+var WORD_DATA = {"bi":[],"uni":[]};
+var currentIdx = parseInt(localStorage.getItem('vocab_currentIdx')||'0');
+var currentMode = localStorage.getItem('vocab_currentMode')||'all';
+var masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_v2')||'[]'));
+var groupFilter = 'all';
+
+// ===== 初始化：从外部词库文件或 localStorage 加载 =====
+(function initData(){
+  // 1. 先从 localStorage 加载用户已保存的词库
+  var saved = localStorage.getItem('word_data_v1');
+  if(saved){
+    try { 
+      var parsed = JSON.parse(saved);
+      if(parsed.bi && parsed.bi.length > 2){
+        WORD_DATA = parsed;
+      } else {
+        // localStorage只有示例数据，尝试加载外部词库
+        loadExternalVocab();
+      }
+    } catch(e) {
+      loadExternalVocab();
+    }
+  } else {
+    // localStorage为空，加载外部词库
+    loadExternalVocab();
+  }
+})();
+
+function loadExternalVocab(){
+  var script = document.createElement('script');
+  script.src = 'word_data.js';
+  script.onload = function(){
+    // word_data.js 会定义全局 WORD_DATA，检查是否成功加载了真实数据
+    if(typeof WORD_DATA !== 'undefined' && WORD_DATA.bi && WORD_DATA.bi.length > 0){
+      saveWordData(); // 保存到 localStorage
+      updateStats();
+      showCard();
+      renderList();
+    } else {
+      // 加载失败，使用示例数据
+      WORD_DATA = DEFAULT_DATA;
+      updateStats();
+      showCard();
+    }
+  };
+  script.onerror = function(){
+    // 加载失败，使用示例数据
+    WORD_DATA = DEFAULT_DATA;
+    updateStats();
+    showCard();
+  };
+  document.head.appendChild(script);
+}
+
+// ===== 保存进度 =====
+function saveProgress(){
+  localStorage.setItem('vocab_currentIdx', currentIdx.toString());
+  localStorage.setItem('vocab_currentMode', currentMode);
+}
+
+// ===== 保存单词库到 localStorage =====
+function saveWordData(){
+  localStorage.setItem('word_data_v1', JSON.stringify(WORD_DATA));
+}
+
+// ===== Excel 上传处理 =====
+function handleExcelUpload(event){
+  var file = event.target.files[0];
+  if(!file) return;
+
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try {
+      var data = new Uint8Array(e.target.result);
+      var workbook = XLSX.read(data, {type:'array'});
+      var sheetName = workbook.SheetNames[0];
+      var sheet = workbook.Sheets[sheetName];
+      // header:1 表示返回数组格式（每行是数组）
+      var rows = XLSX.utils.sheet_to_json(sheet, {header:1, defval:''});
+
+      if(rows.length < 2){
+        showUpdateMsg('文件内容为空或格式不正确<br>至少需要：表头行 + 1行数据');
+        return;
+      }
+
+      // 自动识别表头
+      var rawHeader = rows[0].map(function(h){ return (h||'').toString().trim().toLowerCase(); });
+      // 找到有内容的最后一列
+      var colCount = rawHeader.length;
+
+      var wordCol = -1, meaningCol = -1, pageCol = -1;
+      for(var c=0; c<colCount; c++){
+        var h = rawHeader[c];
+        if(!h) continue;
+        if(h.indexOf('word') !== -1 || h.indexOf('单词') !== -1 || h.indexOf('英文') !== -1) wordCol = c;
+        if(h.indexOf('meaning') !== -1 || h.indexOf('释义') !== -1 || h.indexOf('意思') !== -1 || h.indexOf('中文') !== -1) meaningCol = c;
+        if(h.indexOf('page') !== -1 || h.indexOf('页') !== -1 || h.indexOf('页码') !== -1) pageCol = c;
+      }
+      // 兜底
+      if(wordCol === -1) wordCol = 0;
+      if(meaningCol === -1) meaningCol = colCount - 1;
+
+      // 收集已有单词（用于去重）
+      var existing = new Set();
+      WORD_DATA.bi.forEach(function(g){ g.words.forEach(function(w){ existing.add(w.toLowerCase()); }); });
+      WORD_DATA.uni.forEach(function(g){ if(g.main) existing.add(g.main.toLowerCase()); });
+
+      var newBi = 0, newUni = 0, skipCount = 0;
+
+      for(var r=1; r<rows.length; r++){
+        var row = rows[r];
+        if(!row || !row[wordCol]) continue;
+        var raw = row[wordCol].toString().trim();
+        if(!raw) continue;
+
+        // 解析单词：支持 "word1 / word2" 或 "word1, word2" 或单个
+        var words;
+        if(raw.indexOf('/') !== -1){
+          words = raw.split('/').map(function(w){ return w.trim().toLowerCase(); }).filter(Boolean);
+        } else if(raw.indexOf('，') !== -1){
+          words = raw.split('，').map(function(w){ return w.trim().toLowerCase(); }).filter(Boolean);
+        } else if(raw.indexOf(',') !== -1){
+          words = raw.split(',').map(function(w){ return w.trim().toLowerCase(); }).filter(Boolean);
+        } else {
+          words = [raw.toLowerCase()];
+        }
+
+        if(words.length === 0) continue;
+
+        // 去重：以第一个单词判断
+        if(existing.has(words[0])){ skipCount++; continue; }
+
+        var meaning = (meaningCol >= 0 && row[meaningCol]) ? row[meaningCol].toString().trim() : '';
+        var page = (pageCol >= 0 && row[pageCol]) ? parseInt(row[pageCol]) || 0 : 0;
+
+        if(words.length > 1){
+          WORD_DATA.bi.push({ words:words, meaning:meaning, page:page });
+          newBi++;
+        } else {
+          WORD_DATA.uni.push({ main:words[0], synonyms:[], meaning:meaning, page:page });
+          newUni++;
+        }
+        existing.add(words[0]);
+      }
+
+      // 保存
+      saveWordData();
+      updateStats();
+      showCard();
+      renderList();
+
+      var msg = '✅ 单词库更新完成！<br><br>';
+      msg += '新增双向词组：<b>' + newBi + '</b> 组<br>';
+      msg += '新增单向单词：<b>' + newUni + '</b> 个<br>';
+      msg += '跳过已存在：<b>' + skipCount + '</b> 条<br><br>';
+      msg += '原有学习记录已保留，新单词自动进入「未掌握」。';
+      showUpdateMsg(msg);
+
+    } catch(err) {
+      showUpdateMsg('❌ 解析文件失败：' + err.message + '<br><br>请确保文件是标准 Excel 格式（.xlsx）');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  // 清空，允许重复选同一文件
+  event.target.value = '';
+}
+
+function showUpdateMsg(msg){
+  document.getElementById('updateMsg').innerHTML = msg;
+  document.getElementById('updateModal').classList.add('show');
+}
+function closeUpdateModal(){
+  document.getElementById('updateModal').classList.remove('show');
+}
+
+// ===== 核心功能 =====
+function getGroups(){
+  if(currentMode === 'bi') return WORD_DATA.bi.map(function(g,i){ return Object.assign({},g,{_src:'bi',_id:'bi_'+i}); });
+  if(currentMode === 'uni') return WORD_DATA.uni.map(function(g,i){ return Object.assign({},g,{_src:'uni',_id:'uni_'+i}); });
+  var all = [];
+  WORD_DATA.bi.forEach(function(g,i){ all.push(Object.assign({},g,{_src:'bi',_id:'bi_'+i})); });
+  WORD_DATA.uni.forEach(function(g,i){ all.push(Object.assign({},g,{_src:'uni',_id:'uni_'+i})); });
+  return all;
+}
+
+function updateStats(){
+  document.getElementById('statsBar').innerHTML =
+    '<div class="stat-item"><div class="stat-num">' + WORD_DATA.bi.length + '</div><div class="stat-label">双向组</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + WORD_DATA.uni.length + '</div><div class="stat-label">单向组</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + masteredSet.size + '</div><div class="stat-label">已掌握</div></div>' +
+    '<div class="stat-item"><div class="stat-num">' + (WORD_DATA.bi.length + WORD_DATA.uni.length) + '</div><div class="stat-label">总组数</div></div>';
+}
+
+function showCard(){
+  var groups = getGroups();
+  if(groups.length === 0){
+    document.getElementById('cardArea').innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>没有单词数据</p></div>';
+    return;
+  }
+  if(currentIdx >= groups.length){ currentIdx = 0; saveProgress(); }
+  var g = groups[currentIdx];
+  var ws = g.words ? g.words.join(' / ') : ([g.main].concat(g.synonyms||[]).join(' → '));
+  document.getElementById('cardArea').innerHTML =
+    '<div class="word-card" onclick="flipCard()">' +
+      '<div class="card-front" id="cardFront"><div class="card-word">' + ws + '</div><div style="font-size:13px;opacity:0.75;margin-bottom:16px;">点击翻转查看释义</div><div style="font-size:12px;opacity:0.6;">↓ 点击卡片 ↓</div></div>' +
+      '<div class="card-back" id="cardBack"><div class="card-meaning">' + (g.meaning||'释义待补充') + '</div><div class="card-group-info">第' + (currentIdx+1) + '组 / 共' + groups.length + '组</div></div>' +
+    '</div>' +
+    '<div class="card-actions" style="display:none;" id="cardActs"><button class="action-btn btn-know" onclick="mk(event)">✓ 认识</button><button class="action-btn btn-forget" onclick="mf(event)">✗ 不认识</button></div>' +
+    '<button class="btn-next" onclick="nx()">下一个 →</button>';
+  upProg();
+}
+
+function flipCard(){
+  var f = document.getElementById('cardFront');
+  var b = document.getElementById('cardBack');
+  var a = document.getElementById('cardActs');
+  if(f.style.display !== 'none'){ f.style.display='none'; b.style.display='flex'; a.style.display='flex'; }
+  else { f.style.display='flex'; b.style.display='none'; a.style.display='none'; }
+}
+function nx(){ currentIdx++; saveProgress(); showCard(); }
+function mk(e){
+  e.stopPropagation();
+  var gs = getGroups();
+  masteredSet.add(gs[currentIdx]._id);
+  localStorage.setItem('mastered_v2', JSON.stringify([].concat(gs[currentIdx]._id)));
+  saveProgress(); updateStats(); nx();
+}
+function mf(e){ e.stopPropagation(); saveProgress(); nx(); }
+
+function upProg(){
+  var gs = getGroups();
+  var total = gs.length;
+  var pct = total > 0 ? Math.round(((currentIdx+1)/total)*100) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressText').textContent = (currentIdx+1) + ' / ' + total + ' (' + pct + '%)';
+}
+
+function switchTab(tab, btn){
+  var btns = document.querySelectorAll('.tab-btn');
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+  if(btn) btn.classList.add('active');
+  var pages = document.querySelectorAll('.page-section');
+  for(var i=0;i<pages.length;i++) pages[i].classList.remove('active-page');
+  document.getElementById('page-'+tab).classList.add('active-page');
+}
+function goPage(page, nav){
+  var items = document.querySelectorAll('.nav-item');
+  for(var i=0;i<items.length;i++) items[i].classList.remove('active-nav');
+  if(nav) nav.classList.add('active-nav');
+  var pages = document.querySelectorAll('.page-section');
+  for(var i=0;i<pages.length;i++) pages[i].classList.remove('active-page');
+  document.getElementById('page-'+page).classList.add('active-page');
+  if(page==='group') renderList();
+}
+function switchMode(m, btn){
+  currentMode = m; currentIdx = 0;
+  var btns = document.querySelectorAll('.mode-btn');
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove('active-mode');
+  if(btn) btn.classList.add('active-mode');
+  saveProgress(); showCard();
+}
+
+function renderList(){
+  var q = (document.getElementById('filterInput').value||'').toLowerCase();
+  var html = '';
+  for(var i=0; i<WORD_DATA.bi.length; i++){
+    var g = WORD_DATA.bi[i];
+    var txt = g.words.join(' ');
+    if(q && txt.toLowerCase().indexOf(q) === -1 && (g.meaning||'').toLowerCase().indexOf(q) === -1) continue;
+    var m = masteredSet.has('bi_'+i);
+    if(groupFilter==='mastered' && !m) continue;
+    if(groupFilter==='unmastered' && m) continue;
+    html += '<div class="group-item" onclick="this.querySelector(\'.group-meaning\').classList.toggle(\'show\')">' +
+      '<span class="group-page">双向 · 第'+(i+1)+'组</span>' + (m?'<span class="mastered-badge">✓</span>':'') +
+      '<div class="group-words">' + g.words.map(function(w,j){ return '<span style="color:'+(j===0?'#4A90D9':'#666')+'">'+w+'</span>'; }).join(' · ') + '</div>' +
+      '<div class="group-meaning">' + (g.meaning||'释义待补充') + '</div></div>';
+  }
+  for(var i=0; i<WORD_DATA.uni.length; i++){
+    var g = WORD_DATA.uni[i];
+    var txt = [g.main].concat(g.synonyms||[]).join(' ');
+    if(q && txt.toLowerCase().indexOf(q) === -1 && (g.meaning||'').toLowerCase().indexOf(q) === -1) continue;
+    var m = masteredSet.has('uni_'+i);
+    if(groupFilter==='mastered' && !m) continue;
+    if(groupFilter==='unmastered' && m) continue;
+    html += '<div class="group-item" onclick="this.querySelector(\'.group-meaning\').classList.toggle(\'show\')">' +
+      '<span class="group-page">单向 · 第'+(i+1)+'组</span>' + (m?'<span class="mastered-badge">✓</span>':'') +
+      '<div class="group-words"><span style="color:#4A90D9">'+g.main+'</span> → '+[].concat(g.synonyms||[]).map(function(w){ return '<span style="color:#666">'+w+'</span>'; }).join(' · ') + '</div>' +
+      '<div class="group-meaning">' + (g.meaning||'释义待补充') + '</div></div>';
+  }
+  document.getElementById('groupList').innerHTML = html || '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">🔍</div><p>未找到</p></div>';
+}
+function filterGroup(f, btn){
+  groupFilter = f;
+  var btns = document.querySelectorAll('.mode-btn');
+  for(var i=0;i<btns.length;i++) btns[i].classList.remove('active-mode');
+  if(btn) btn.classList.add('active-mode');
+  renderList();
+}
+function doFilter(){ renderList(); }
+
+function doSearch(){
+  var q = (document.getElementById('wordSearchInput').value||'').toLowerCase();
+  if(!q){ document.getElementById('searchResult').innerHTML=''; return; }
+  var res = [];
+  WORD_DATA.bi.forEach(function(g){
+    g.words.forEach(function(w){
+      if(w.toLowerCase().indexOf(q) !== -1) res.push({words:g.words, meaning:g.meaning});
+    });
+  });
+  WORD_DATA.uni.forEach(function(g){
+    [g.main].concat(g.synonyms||[]).forEach(function(w){
+      if(w.toLowerCase().indexOf(q) !== -1) res.push({words:[g.main].concat(g.synonyms||[]), meaning:g.meaning});
+    });
+  });
+  if(!res.length){
+    document.getElementById('searchResult').innerHTML = '<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">😕</div><p>未找到</p></div>';
+    return;
+  }
+  document.getElementById('searchResult').innerHTML = res.map(function(r){
+    return '<div style="background:white;padding:12px 16px;margin-bottom:8px;border-radius:12px;"><div style="font-size:16px;font-weight:600;color:#4A90D9;">'+r.words.join(' / ')+'</div><div style="font-size:14px;color:#555;margin-top:6px;">'+(r.meaning||'释义待补充')+'</div></div>';
+  }).join('');
+}
+
+// ===== 启动 =====
+(function startApp(){
+  var saved = localStorage.getItem('word_data_v1');
+  if(saved){
+    try {
+      var parsed = JSON.parse(saved);
+      // 如果有保存的词库且有真实数据，直接使用
+      if(parsed && parsed.bi && parsed.bi.length > 0){
+        WORD_DATA = parsed;
+        updateStats();
+        showCard();
+        return;
+      }
+    } catch(e) {}
+  }
+  // 否则加载外部词库
+  loadExternalVocab();
+})();
+</script>
+</body>
+</html>
