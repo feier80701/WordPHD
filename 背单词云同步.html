@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>研究生英语单词</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC',sans-serif; background:#F5F7FA; color:#2D3436; min-height:100vh; padding-bottom:80px; }
+.header { background:linear-gradient(135deg,#4A90D9,#6BA8E2); color:white; padding:20px; position:sticky; top:0; z-index:100; box-shadow:0 2px 10px rgba(74,144,217,0.3); }
+.header h1 { font-size:22px; font-weight:700; margin-bottom:4px; }
+.header .subtitle { font-size:13px; opacity:0.85; }
+.cloud-bar { padding:8px 20px; background:rgba(0,0,0,0.08); font-size:12px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cloud-bar span { padding:4px 10px; border-radius:12px; }
+.cloud-bar button { padding:5px 12px; border:1px solid rgba(255,255,255,0.5); background:rgba(255,255,255,0.15); color:white; border-radius:12px; font-size:12px; cursor:pointer; }
+.stats-bar { display:flex; gap:10px; padding:14px 20px; background:#FFF; margin:12px 16px 0; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); }
+.stat-item { flex:1; text-align:center; }
+.stat-num { font-size:22px; font-weight:800; color:#4A90D9; }
+.stat-label { font-size:11px; color:#636E72; margin-top:2px; }
+.tab-btns { display:flex; gap:0; margin:12px 16px; background:#FFF; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); overflow:hidden; }
+.tab-btn { flex:1; padding:12px 8px; border:none; background:transparent; font-size:15px; font-weight:600; color:#636E72; cursor:pointer; }
+.tab-btn.active { background:#4A90D9; color:white; }
+.mode-switcher { display:flex; justify-content:center; gap:12px; margin:14px 16px; }
+.mode-btn { padding:10px 20px; border:2px solid #4A90D9; background:white; border-radius:30px; font-size:14px; font-weight:600; cursor:pointer; }
+.mode-btn.active-mode { background:#4A90D9; color:white; }
+.card-container { display:flex; flex-direction:column; align-items:center; padding:20px 16px; }
+.word-card { width:100%; max-width:380px; min-height:260px; background:#FFF; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer; }
+.card-front, .card-back { width:100%; min-height:260px; padding:32px 24px; border-radius:16px; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+.card-front { background:linear-gradient(145deg,#667eea,#764ba2); color:white; }
+.card-back { background:linear-gradient(145deg,#11998e,#38ef7d); color:white; display:none; }
+.card-word { font-size:36px; font-weight:800; text-align:center; line-height:1.3; margin-bottom:12px; }
+.card-meaning { font-size:22px; font-weight:600; text-align:center; line-height:1.5; margin-bottom:12px; }
+.card-group-info { font-size:13px; opacity:0.85; background:rgba(255,255,255,0.2); padding:6px 14px; border-radius:20px; margin-top:8px; }
+.card-actions { display:flex; gap:12px; margin-top:20px; width:100%; max-width:380px; }
+.action-btn { flex:1; padding:14px; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; color:white; }
+.btn-know { background:#51CF66; }
+.btn-forget { background:#FF6B6B; }
+.btn-next { background:#4A90D9; color:white; width:100%; margin-top:10px; border:none; border-radius:12px; padding:16px; font-size:17px; font-weight:700; cursor:pointer; }
+.progress-wrap { padding:0 16px; margin-top:12px; }
+.progress-track { height:6px; background:#E0E0E0; border-radius:3px; overflow:hidden; }
+.progress-fill { height:100%; background:linear-gradient(90deg,#51CF66,#38ef7d); border-radius:3px; transition:width 0.3s; width:0%; }
+.progress-text { font-size:12px; color:#636E72; margin-top:6px; text-align:center; }
+.group-list { padding:8px 16px; }
+.group-item { background:#FFF; border-radius:16px; padding:16px 18px; margin-bottom:10px; box-shadow:0 2px 12px rgba(0,0,0,0.08); cursor:pointer; }
+.group-page { font-size:11px; color:#636E72; background:#E8F0FE; padding:3px 10px; border-radius:10px; display:inline-block; margin-bottom:8px; }
+.group-words { font-size:16px; font-weight:600; color:#2D3436; line-height:1.6; }
+.group-meaning { font-size:13px; color:#636E72; margin-top:8px; display:none; padding-top:8px; border-top:1px dashed #eee; }
+.group-meaning.show { display:block; }
+.search-box { margin:12px 16px; }
+.search-input { width:100%; padding:14px 18px; border:2px solid #E0E0E0; border-radius:16px; font-size:16px; outline:none; }
+.search-input:focus { border-color:#4A90D9; }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:white; display:flex; box-shadow:0 -2px 10px rgba(0,0,0,0.06); z-index:100; }
+.nav-item { flex:1; padding:12px 0; text-align:center; font-size:12px; color:#636E72; cursor:pointer; border:none; background:none; }
+.nav-item.active-nav { color:#4A90D9; }
+.nav-icon { font-size:22px; margin-bottom:2px; }
+.page-section { display:none; }
+.page-section.active-page { display:block; }
+.mastered-badge { display:inline-block; background:#D4EDDA; color:#155724; font-size:11px; padding:2px 8px; border-radius:8px; margin-left:8px; }
+.empty-state { text-align:center; padding:60px 20px; color:#636E72; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📚 研究生英语单词</h1>
+  <div class="subtitle">按同义词组记忆 · 高效备考</div>
+</div>
+
+<div class="cloud-bar">
+  <span id="cloudStatus">⚠️ 未设置同步码</span>
+  <button onclick="showSyncModal()">☁️ 云同步设置</button>
+  <button onclick="testConn()">测试连接</button>
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="tab-btns">
+  <button class="tab-btn active" onclick="switchTab('flashcard',this)">🃏 闪卡</button>
+  <button class="tab-btn" onclick="switchTab('group',this)">📋 词组</button>
+  <button class="tab-btn" onclick="switchTab('search',this)">🔍 查词</button>
+</div>
+
+<div id="page-flashcard" class="page-section active-page">
+  <div class="mode-switcher">
+    <button class="mode-btn active-mode" onclick="switchMode('all',this)">全部</button>
+    <button class="mode-btn" onclick="switchMode('bi',this)">双向</button>
+    <button class="mode-btn" onclick="switchMode('uni',this)">单向</button>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="progress-text" id="progressText">0 / 0</div>
+  </div>
+  <div class="card-container" id="cardArea"></div>
+</div>
+
+<div id="page-group" class="page-section">
+  <div style="padding:8px 16px;">
+    <button onclick="filterGroup('all',this)" style="padding:8px 12px;border:none;background:#4A90D9;color:white;border-radius:8px;cursor:pointer;margin-right:4px;">全部</button>
+    <button onclick="filterGroup('mastered',this)" style="padding:8px 12px;border:1px solid #4A90D9;background:transparent;color:#4A90D9;border-radius:8px;cursor:pointer;margin-right:4px;">已掌握</button>
+    <button onclick="filterGroup('unmastered',this)" style="padding:8px 12px;border:1px solid #4A90D9;background:transparent;color:#4A90D9;border-radius:8px;cursor:pointer;">未掌握</button>
+  </div>
+  <div class="search-box"><input type="text" class="search-input" id="filterInput" placeholder="筛选词组..." oninput="doFilter()"></div>
+  <div class="group-list" id="groupList"></div>
+</div>
+
+<div id="page-search" class="page-section">
+  <div class="search-box"><input type="text" class="search-input" id="wordSearchInput" placeholder="输入英文单词..." oninput="doSearch()"></div>
+  <div id="searchResult" style="padding:16px;"></div>
+</div>
+
+<div class="bottom-nav">
+  <button class="nav-item active-nav" onclick="goPage('flashcard',this)"><div class="nav-icon">🃏</div>闪卡</button>
+  <button class="nav-item" onclick="goPage('group',this)"><div class="nav-icon">📋</div>词组</button>
+  <button class="nav-item" onclick="goPage('search',this)"><div class="nav-icon">🔍</div>查词</button>
+</div>
+
+<!-- 云同步弹窗 -->
+<div id="syncModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+  <div style="background:white;border-radius:20px;padding:32px 24px;width:90%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="font-size:20px;font-weight:700;text-align:center;margin-bottom:20px;">☁️ 云同步设置</div>
+    <div id="syncDesc" style="font-size:14px;color:#636E72;text-align:center;margin-bottom:24px;line-height:1.6;">输入同步码以在多设备间同步进度</div>
+    
+    <button onclick="doGenCode()" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:#4A90D9;color:white;">生成同步码</button>
+    
+    <div id="genArea" style="display:none;margin-top:16px;">
+      <div style="background:linear-gradient(135deg,#667eea,#764ba2);color:white;padding:20px;border-radius:12px;text-align:center;">
+        <div style="font-size:13px;opacity:0.9;">你的同步码</div>
+        <div id="codeShow" style="font-size:32px;font-weight:800;letter-spacing:6px;margin:8px 0;"></div>
+        <div style="font-size:12px;opacity:0.8;">在其他设备上输入此码</div>
+      </div>
+      <button onclick="doUseCode()" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:#4A90D9;color:white;margin-top:12px;">使用此码同步</button>
+    </div>
+    
+    <div style="margin-top:16px;text-align:center;color:#999;font-size:13px;">— 或输入已有同步码 —</div>
+    <div style="margin-top:12px;">
+      <input type="text" id="codeInput" placeholder="输入6位同步码" maxlength="6" style="width:100%;padding:14px 16px;border:2px solid #E0E0E0;border-radius:12px;font-size:18px;text-align:center;outline:none;letter-spacing:4px;">
+      <button onclick="doInputCode()" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:#4A90D9;color:white;margin-top:12px;">连接同步</button>
+    </div>
+    
+    <button onclick="closeSyncModal()" style="width:100%;padding:14px;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer;background:#F5F7FA;color:#636E72;margin-top:16px;">关闭</button>
+  </div>
+</div>
+
+<script src="https://imgcache.qq.com/qcloud/tcbjs/2.3.3/tcb.js"></script>
+<script>
+// ===== 数据 =====
+var WORD_DATA = {"bi":[{"words":["illness","sickness","disease"],"meaning":"n. 疾病，病痛","page":7},{"words":["happy","glad","joyful"],"meaning":"adj. 高兴的，快乐的","page":7},{"words":["big","large","huge"],"meaning":"adj. 大的，巨大的","page":7}],"uni":[]};
+var currentIdx = parseInt(localStorage.getItem('vocab_currentIdx')||'0');
+var currentMode = localStorage.getItem('vocab_currentMode')||'all';
+var masteredSet = new Set(JSON.parse(localStorage.getItem('mastered_v2')||'[]'));
+var groupFilter = 'all';
+var CLOUD_ENV = 'word-d2gn956jra49d3aef';
+var cloudDb = null;
+var cloudReady = false;
+var syncCode = localStorage.getItem('syncCode')||'';
+
+// ===== 云同步弹窗 =====
+function showSyncModal(){
+  document.getElementById('syncModal').style.display='flex';
+  document.getElementById('genArea').style.display='none';
+  document.getElementById('codeInput').value='';
+  if(syncCode){
+    document.getElementById('syncDesc').innerHTML='当前同步码：<b>'+syncCode+'</b><br>可输入新码更换。';
+  }
+}
+function closeSyncModal(){ document.getElementById('syncModal').style.display='none'; }
+
+function doGenCode(){
+  var chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  var code='';
+  for(var i=0;i<6;i++) code+=chars.charAt(Math.floor(Math.random()*chars.length));
+  document.getElementById('codeShow').textContent=code;
+  document.getElementById('genArea').style.display='block';
+  window._tmpCode=code;
+}
+function doUseCode(){
+  var c=window._tmpCode; if(!c) return;
+  syncCode=c;
+  localStorage.setItem('syncCode',syncCode);
+  closeSyncModal();
+  initCloud();
+}
+function doInputCode(){
+  var c=document.getElementById('codeInput').value.trim().toUpperCase();
+  if(c.length!==6){alert('请输入6位同步码');return;}
+  syncCode=c;
+  localStorage.setItem('syncCode',syncCode);
+  closeSyncModal();
+  initCloud();
+}
+
+// ===== 云同步核心 =====
+function setStatus(msg,isOk){
+  var el=document.getElementById('cloudStatus');
+  el.textContent=msg;
+  el.style.background=isOk?'rgba(81,207,102,0.3)':'rgba(255,107,107,0.3)';
+}
+
+async function testConn(){
+  try{
+    var app=tcb.init({env:CLOUD_ENV});
+    alert('SDK初始化成功');
+    var auth=app.auth({persistence:'local'});
+    await auth.signInAnonymously();
+    alert('匿名登录成功！');
+    var db=app.database();
+    await db.collection('progress').limit(1).get();
+    alert('数据库连接成功！');
+  }catch(e){
+    alert('连接失败：'+e.message);
+  }
+}
+
+async function initCloud(){
+  if(!syncCode){setStatus('⚠️ 未设置同步码',false);return;}
+  try{
+    var app=tcb.init({env:CLOUD_ENV});
+    var auth=app.auth({persistence:'local'});
+    await auth.signInAnonymously();
+    cloudDb=app.database();
+    cloudReady=true;
+    setStatus('已连接，同步中...',true);
+    await loadCloud();
+    setStatus('✅ 云端同步正常',true);
+  }catch(e){
+    setStatus('❌ 同步失败:'+e.message,false);
+  }
+}
+
+async function saveCloud(){
+  if(!cloudReady||!cloudDb||!syncCode) return;
+  try{
+    var data={
+      syncCode:syncCode,
+      currentIdx:parseInt(currentIdx),
+      currentMode:currentMode,
+      mastered:[...masteredSet],
+      updatedAt:Date.now()
+    };
+    var res=await cloudDb.collection('progress').where({syncCode:syncCode}).get();
+    if(res.data&&res.data.length>0){
+      await cloudDb.collection('progress').doc(res.data[0]._id).update(data);
+    }else{
+      await cloudDb.collection('progress').add(data);
+    }
+    setStatus('✅ 云端同步正常',true);
+  }catch(e){
+    setStatus('❌ 同步失败:'+e.message,false);
+  }
+}
+
+async function loadCloud(){
+  if(!cloudReady||!cloudDb||!syncCode) return;
+  try{
+    var res=await cloudDb.collection('progress').where({syncCode:syncCode}).get();
+    if(res.data&&res.data.length>0){
+      var d=res.data[0];
+      var localT=parseInt(localStorage.getItem('localUpdatedAt')||'0');
+      if(d.updatedAt&&d.updatedAt>localT){
+        currentIdx=d.currentIdx||0;
+        currentMode=d.currentMode||'all';
+        masteredSet=new Set(d.mastered||[]);
+        localStorage.setItem('vocab_currentIdx',currentIdx.toString());
+        localStorage.setItem('vocab_currentMode',currentMode);
+        localStorage.setItem('mastered_v2',JSON.stringify([...masteredSet]));
+        localStorage.setItem('localUpdatedAt',d.updatedAt.toString());
+        showCard();updateStats();renderList();
+      }else{
+        await saveCloud();
+      }
+    }else{
+      await saveCloud();
+    }
+  }catch(e){
+    setStatus('❌ 加载失败:'+e.message,false);
+  }
+}
+
+function saveProgress(){
+  localStorage.setItem('vocab_currentIdx',currentIdx.toString());
+  localStorage.setItem('vocab_currentMode',currentMode);
+  localStorage.setItem('localUpdatedAt',Date.now().toString());
+  if(cloudReady&&syncCode) saveCloud();
+}
+
+// ===== 功能函数 =====
+function getGroups(){
+  if(currentMode=='bi') return WORD_DATA.bi.map(function(g,i){return Object.assign({},g,{_src:'bi',_id:'bi_'+i});});
+  if(currentMode=='uni') return WORD_DATA.uni.map(function(g,i){return Object.assign({},g,{_src:'uni',_id:'uni_'+i});});
+  var all=[];
+  WORD_DATA.bi.forEach(function(g,i){all.push(Object.assign({},g,{_src:'bi',_id:'bi_'+i}));});
+  WORD_DATA.uni.forEach(function(g,i){all.push(Object.assign({},g,{_src:'uni',_id:'uni_'+i}));});
+  return all;
+}
+
+function updateStats(){
+  document.getElementById('statsBar').innerHTML=
+    '<div class="stat-item"><div class="stat-num">'+WORD_DATA.bi.length+'</div><div class="stat-label">双向组</div></div>'+
+    '<div class="stat-item"><div class="stat-num">'+WORD_DATA.uni.length+'</div><div class="stat-label">单向组</div></div>'+
+    '<div class="stat-item"><div class="stat-num">'+masteredSet.size+'</div><div class="stat-label">已掌握</div></div>'+
+    '<div class="stat-item"><div class="stat-num">'+(WORD_DATA.bi.length+WORD_DATA.uni.length)+'</div><div class="stat-label">总组数</div></div>';
+}
+
+function showCard(){
+  var groups=getGroups();
+  if(groups.length===0){document.getElementById('cardArea').innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">📭</div><p>没有单词数据</p></div>';return;}
+  if(currentIdx>=groups.length){currentIdx=0;saveProgress();}
+  var g=groups[currentIdx];
+  var ws=g.words?g.words.join(' / '):[g.main].concat(g.synonyms).join(' → ');
+  document.getElementById('cardArea').innerHTML=
+    '<div class="word-card" onclick="flipCard()">'+
+      '<div class="card-front" id="cardFront"><div class="card-word">'+ws+'</div><div style="font-size:13px;opacity:0.75;margin-bottom:16px;">点击翻转查看释义</div><div style="font-size:12px;opacity:0.6;">↓ 点击卡片 ↓</div></div>'+
+      '<div class="card-back" id="cardBack"><div class="card-meaning">'+(g.meaning||'释义待补充')+'</div><div class="card-group-info">第'+(currentIdx+1)+'组 / 共'+groups.length+'组</div></div>'+
+    '</div>'+
+    '<div class="card-actions" style="display:none;" id="cardActs"><button class="action-btn btn-know" onclick="mk(event)">✓ 认识</button><button class="action-btn btn-forget" onclick="mf(event)">✗ 不认识</button></div>'+
+    '<button class="btn-next" onclick="nx()">下一个 →</button>';
+  upProg();
+}
+
+function flipCard(){
+  var f=document.getElementById('cardFront'),b=document.getElementById('cardBack'),a=document.getElementById('cardActs');
+  if(f.style.display!=='none'){f.style.display='none';b.style.display='flex';a.style.display='flex';}
+  else{f.style.display='flex';b.style.display='none';a.style.display='none';}
+}
+function nx(){currentIdx++;saveProgress();showCard();}
+function mk(e){e.stopPropagation();var gs=getGroups();masteredSet.add(gs[currentIdx]._id);localStorage.setItem('mastered_v2',JSON.stringify([...masteredSet]));saveProgress();updateStats();nx();}
+function mf(e){e.stopPropagation();saveProgress();nx();}
+function upProg(){
+  var gs=getGroups();
+  var pct=gs.length>0?Math.round(((currentIdx+1)/gs.length)*100):0;
+  document.getElementById('progressFill').style.width=pct+'%';
+  document.getElementById('progressText').textContent=(currentIdx+1)+' / '+gs.length+' ('+pct+'%)';
+}
+
+function switchTab(tab,btn){
+  var btns=document.querySelectorAll('.tab-btn');for(var i=0;i<btns.length;i++) btns[i].classList.remove('active');
+  if(btn) btn.classList.add('active');
+  var pages=document.querySelectorAll('.page-section');for(var i=0;i<pages.length;i++) pages[i].classList.remove('active-page');
+  document.getElementById('page-'+tab).classList.add('active-page');
+}
+function goPage(page,nav){
+  var items=document.querySelectorAll('.nav-item');for(var i=0;i<items.length;i++) items[i].classList.remove('active-nav');
+  if(nav) nav.classList.add('active-nav');
+  var pages=document.querySelectorAll('.page-section');for(var i=0;i<pages.length;i++) pages[i].classList.remove('active-page');
+  document.getElementById('page-'+page).classList.add('active-page');
+  if(page==='group') renderList();
+}
+function switchMode(m,btn){
+  currentMode=m;currentIdx=0;
+  var btns=document.querySelectorAll('.mode-btn');for(var i=0;i<btns.length;i++) btns[i].classList.remove('active-mode');
+  if(btn) btn.classList.add('active-mode');
+  saveProgress();showCard();
+}
+
+function renderList(){
+  var q=(document.getElementById('filterInput').value||'').toLowerCase();
+  var html='';
+  for(var i=0;i<WORD_DATA.bi.length;i++){
+    var g=WORD_DATA.bi[i];
+    var txt=g.words.join(' ');
+    if(q&&txt.toLowerCase().indexOf(q)===-1&&(g.meaning||'').toLowerCase().indexOf(q)===-1) continue;
+    var m=masteredSet.has('bi_'+i);
+    if(groupFilter==='mastered'&&!m) continue;
+    if(groupFilter==='unmastered'&&m) continue;
+    html+='<div class="group-item" onclick="this.querySelector(\'.group-meaning\').classList.toggle(\'show\')">'+
+      '<span class="group-page">双向 · 第'+(i+1)+'组</span>'+(m?'<span class="mastered-badge">✓</span>':'')+
+      '<div class="group-words">'+g.words.map(function(w,j){return '<span style="color:'+(j===0?'#4A90D9':'#666')+'">'+w+'</span>';}).join(' · ')+'</div>'+
+      '<div class="group-meaning">'+(g.meaning||'释义待补充')+'</div></div>';
+  }
+  for(var i=0;i<WORD_DATA.uni.length;i++){
+    var g=WORD_DATA.uni[i];
+    var txt=[g.main].concat(g.synonyms).join(' ');
+    if(q&&txt.toLowerCase().indexOf(q)===-1&&(g.meaning||'').toLowerCase().indexOf(q)===-1) continue;
+    var m=masteredSet.has('uni_'+i);
+    if(groupFilter==='mastered'&&!m) continue;
+    if(groupFilter==='unmastered'&&m) continue;
+    html+='<div class="group-item" onclick="this.querySelector(\'.group-meaning\').classList.toggle(\'show\')">'+
+      '<span class="group-page">单向 · 第'+(i+1)+'组</span>'+(m?'<span class="mastered-badge">✓</span>':'')+
+      '<div class="group-words"><span style="color:#4A90D9">'+g.main+'</span> → '+g.synonyms.map(function(w){return '<span style="color:#666">'+w+'</span>';}).join(' · ')+'</div>'+
+      '<div class="group-meaning">'+(g.meaning||'释义待补充')+'</div></div>';
+  }
+  document.getElementById('groupList').innerHTML=html||'<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">🔍</div><p>未找到</p></div>';
+}
+function filterGroup(f,btn){
+  groupFilter=f;
+  var btns=document.querySelectorAll('.mode-btn');for(var i=0;i<btns.length;i++) btns[i].classList.remove('active-mode');
+  if(btn) btn.classList.add('active-mode');
+  renderList();
+}
+function doFilter(){ renderList(); }
+
+function doSearch(){
+  var q=(document.getElementById('wordSearchInput').value||'').toLowerCase();
+  if(!q){document.getElementById('searchResult').innerHTML='';return;}
+  var res=[];
+  WORD_DATA.bi.forEach(function(g){g.words.forEach(function(w){if(w.toLowerCase().indexOf(q)!==-1) res.push({words:g.words,meaning:g.meaning});});});
+  WORD_DATA.uni.forEach(function(g){[g.main].concat(g.synonyms).forEach(function(w){if(w.toLowerCase().indexOf(q)!==-1) res.push({words:[g.main].concat(g.synonyms),meaning:g.meaning});});});
+  if(!res.length){document.getElementById('searchResult').innerHTML='<div class="empty-state"><div style="font-size:48px;margin-bottom:12px;">😕</div><p>未找到</p></div>';return;}
+  document.getElementById('searchResult').innerHTML=res.map(function(r){
+    return '<div style="background:white;padding:12px 16px;margin-bottom:8px;border-radius:12px;"><div style="font-size:16px;font-weight:600;color:#4A90D9;">'+r.words.join(' / ')+'</div><div style="font-size:14px;color:#555;margin-top:6px;">'+(r.meaning||'释义待补充')+'</div></div>';
+  }).join('');
+}
+
+// ===== 初始化 =====
+updateStats();
+showCard();
+if(syncCode){initCloud();}else{setStatus('⚠️ 未设置同步码',false);}
+</script>
+</body>
+</html>
